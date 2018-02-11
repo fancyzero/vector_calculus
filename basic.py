@@ -2,9 +2,37 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 from decimal import Decimal
+from random import gauss
+def random_unit_vector(dims):
+    vec = [gauss(0, 1) for i in range(dims)]
+    mag = sum(x ** 2 for x in vec) ** .5
+    return [x / mag for x in vec]
 
-def field_func(x,y):
-    return np.array((np.sin(y),np.cos(x)))
+
+def init_perlin_seed(w,h):
+    seed={}
+    seed["grid"] =  np.ndarray((w,h,2))
+
+    i = np.nditer(seed,flags=["external_loop","buffered"],op_flags=["readwrite"],buffersize=2)
+    while not i.finished:
+        i[0]=random_unit_vector(2)
+        i.iternext()
+    seed["size"]=(w,h)
+    return seed
+
+
+def noise_scalar_field(perlin_seed,x,y):
+    seed["size"]
+    pass
+
+
+def scalar_field_func(x,y):
+    return np.sin(x) - np.cos(y)
+
+def gradient(func,x,y,delta=(0.00001)):
+    partialx= (func(x+delta,y) - func(x,y))/delta
+    partialy= (func(x,y+delta) - func(x,y))/delta
+    return np.array((partialx, partialy))
 
 def partial_derivative(func, x,y,respectto, delta=(0.00001)):
     if (respectto == "x"):
@@ -31,7 +59,7 @@ def show_vector_field(func,x,y,title=""):
     f=np.ndarray((len(x),len(y),2))
     for i,vx in enumerate(x):
         for j,vy in enumerate(y):
-            pp = field_func(vx, vy)
+            pp = gradient(func,vx, vy)
             f[i, j] = pp
     r = np.dsplit(f,2)
     u = np.squeeze(r[1])
@@ -46,10 +74,19 @@ def show_scalar_field(field,title=""):
     plt.title(title)
     plt.show()
 
+
+seed=init_perlin_seed(100,100)
+
+for i in range(1024):
+    for j in range(1024):
+        f = np.ndarray((1024,1024))
+        f[i,j] = noise_scalar_field(seed, i,j,1024,1024)
+
+
 row = np.arange(-6,6,0.4)
 column = np.arange(-6,6,0.4)
-show_vector_field(field_func,row,column,"field")
-show_scalar_field(divergence(field_func,row,column),"divergence")
-show_scalar_field(curl(field_func,row,column),"curl")
+show_vector_field(scalar_field_func,row,column,"field")
+show_scalar_field(divergence(scalar_field_func,row,column),"divergence")
+show_scalar_field(curl(scalar_field_func,row,column),"curl")
 
 
