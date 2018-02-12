@@ -8,15 +8,6 @@ import functools
 gdelta = 1.0/2**16
 def scalar_field_func(x,y):
     return np.sin(x) - np.cos(y)
-# def gradient(func,x,y,delta=(0.00001)):
-#     partialx= (func(x+delta,y) - func(x,y))/delta
-#     partialy= (func(x,y+delta) - func(x,y))/delta
-#     print(partialx,partialy)
-#     return np.array((partialx, partialy))
-
-
-def scalar_field_func(x,y):
-    return np.sin(x)-np.cos(y)
 
 def gradient(func, x,y,delta=gdelta):
     f = func(x,y)
@@ -66,32 +57,33 @@ def show_scalar_field(field,title=""):
     plt.show()
 
 
-seed=init_perlin_seed(3,3)
-f = np.ndarray((128, 128))
-f2 = np.ndarray((128, 128))
-for i in range(128):
-    for j in range(128):
-        f2[i,j] = noise_scalar_field( i/128.0,j/128.0, seed)
+if __name__ == "__main__":
+    seed=init_perlin_seed(3,3)
+    f = np.ndarray((128, 128))
+    f2 = np.ndarray((128, 128))
+    for i in range(128):
+        for j in range(128):
+            f2[i,j] = noise_scalar_field( i/128.0,j/128.0, seed)
 
-plt.imshow(f2,cmap="gray",origin='lower')
-plt.title("perlin noise")
-plt.show()
+    plt.imshow(f2,cmap="gray",origin='lower')
+    plt.title("perlin noise")
+    plt.show()
 
 
 
-row = np.arange(0,1,0.01)
-column = np.arange(0,1,0.01)
+    row = np.arange(0,1,0.04)
+    column = np.arange(0,1,0.04)
 
-perlinnoise_func = functools.partial(noise_scalar_field,seed = seed)
-func = functools.partial(gradient,func=perlinnoise_func)
-p = np.array(((92,48),(92,49),(92,50),(92,51),(92,52)))/100.0
-for pp in p:
-    print(partial_derivative(func,pp[0],pp[1],"x")[0] , partial_derivative(func,pp[0],pp[1],"y")[1])
-    print(partial_derivative(func, pp[0], pp[1], "x")[0]+ partial_derivative(func, pp[0], pp[1], "y")[1])
+    perlinnoise_func = functools.partial(noise_scalar_field,seed = seed)
+    func = functools.partial(gradient,func=perlinnoise_func)
+    p = np.array(((92,48),(92,49),(92,50),(92,51),(92,52)))/100.0
+    for pp in p:
+        print(partial_derivative(func,pp[0],pp[1],"x")[0] , partial_derivative(func,pp[0],pp[1],"y")[1])
+        print(partial_derivative(func, pp[0], pp[1], "x")[0]+ partial_derivative(func, pp[0], pp[1], "y")[1])
 
-show_vector_field(func,row,column,"field")
-div = divergence(func, row, column)
-show_scalar_field(div.T,"Laplacian") #Laplacian ( divergence of gradient of a scalar field )
-show_scalar_field(curl(func,row,column),"curl") # curl of gradient it should be 0
+    show_vector_field(func,row,column,"field")
+    div = divergence(func, row, column)
+    show_scalar_field(div.T,"Laplacian") #Laplacian ( divergence of gradient of a scalar field )
+    show_scalar_field(curl(func,row,column),"curl") # curl of gradient it should be 0
 
 
